@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/M4cs/gomodio/pkg/errorhandling"
 	"github.com/M4cs/gomodio/pkg/helpers"
 	"github.com/M4cs/gomodio/pkg/user"
 )
@@ -196,8 +198,19 @@ func DeleteMod(modID int, gameID int, user *user.User) (err error) {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
 	if resp.StatusCode != 204 {
-		return errors.New("mod not found or you do not have permission to delete this mod")
+		var errObj *errorhandling.ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return errorhandling.HandleResponseError(errObj)
 	}
 	return nil
 }
@@ -243,6 +256,14 @@ func AddMod(logo string, modName string, summary string, options map[string]stri
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return res, err
+	}
+	if resp.StatusCode != 200 {
+		var errObj *errorhandling.ErrorCase
+		e := json.Unmarshal(b, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, errorhandling.HandleResponseError(errObj)
 	}
 	err = json.Unmarshal(b, &res)
 	if err != nil {

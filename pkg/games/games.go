@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/M4cs/gomodio/pkg/errorhandling"
 	"github.com/M4cs/gomodio/pkg/helpers"
 	"github.com/M4cs/gomodio/pkg/user"
 )
@@ -136,6 +138,14 @@ func EditGame(gameID int, query map[string]string, user *user.User) (res *Game, 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		var errObj *errorhandling.ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, errorhandling.HandleResponseError(errObj)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -171,6 +181,14 @@ func GetGame(gameID int, query map[string]string, user *user.User) (res *Game, e
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		var errObj *errorhandling.ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, errorhandling.HandleResponseError(errObj)
+	}
 	if err != nil {
 		return nil, err
 	}

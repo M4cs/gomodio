@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/M4cs/gomodio/pkg/errorhandling"
 	"github.com/M4cs/gomodio/pkg/helpers"
 	"github.com/M4cs/gomodio/pkg/user"
 )
@@ -69,6 +71,14 @@ func GetModfiles(modID int, gameID int, options map[string]string, user *user.Us
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 201 {
+		var errObj *errorhandling.ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, errorhandling.HandleResponseError(errObj)
+	}
 	if err != nil {
 		return f, err
 	}
@@ -98,6 +108,14 @@ func GetModfile(fileID int, modID int, gameID int, user *user.User) (f *File, er
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return f, err
+	}
+	if resp.StatusCode != 200 {
+		var errObj *errorhandling.ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, errorhandling.HandleResponseError(errObj)
 	}
 	err = json.Unmarshal(body, &f)
 	if err != nil {
@@ -130,11 +148,54 @@ func EditModfile(modID int, gameID int, options map[string]string, user *user.Us
 	if err != nil {
 		return f, err
 	}
+	if resp.StatusCode != 200 {
+		var errObj *errorhandling.ErrorCase
+		e := json.Unmarshal(b, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, errorhandling.HandleResponseError(errObj)
+	}
+
 	err = json.Unmarshal(b, &f)
 	if err != nil {
 		return f, err
 	}
 	return f, nil
+}
+
+// DeleteModfile sends a DELETE request to delete a mod file
+func DeleteModfile(fileID int, modID int, gameID int, user *user.User) (err error) {
+	if user.OAuth2Token() == "" {
+		return errors.New("requires OAuth2 token")
+	}
+	client := http.Client{Timeout: time.Duration(5 * time.Second)}
+	req, err := http.NewRequest("DELETE", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID)+"/files/"+strconv.Itoa(fileID), nil)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if err != nil {
+		return err
+	}
+	if user.OAuth2Token() != "" || len(user.OAuth2Token()) > 1 {
+		req.Header.Set("Authorization", "Bearer "+user.OAuth2Token())
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 204 {
+		var errObj *errorhandling.ErrorCase
+		e := json.Unmarshal(b, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return errorhandling.HandleResponseError(errObj)
+	}
+	return nil
 }
 
 // AddModfile sends a POST request to upload a mod file
@@ -176,6 +237,14 @@ func AddModfile(modID int, gameID int, fp string, options map[string]string, use
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return f, err
+	}
+	if resp.StatusCode != 201 {
+		var errObj *errorhandling.ErrorCase
+		e := json.Unmarshal(b, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, errorhandling.HandleResponseError(errObj)
 	}
 	err = json.Unmarshal(b, &f)
 	if err != nil {

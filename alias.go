@@ -73,4 +73,6 @@ var (
 	AddModfile = files.AddModfile
 	// EditModfile sends a PUT request to edit a mod file.
 	EditModfile = files.EditModfile
+	// DeleteModfile sends a DELETE request to delete a mod file.
+	DeleteModfile = files.DeleteModfile
 )
