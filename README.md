@@ -38,38 +38,21 @@ func main() {
 
 ## Completion
 
-[X] Authentication (No Third-Party)
-
-[X] Games
-
-[X] Mods
-
-[X] Files
-
-[ ] Subscribe
-
-[ ] Comments
-
-[ ] Media
-
-[ ] Events
-
-[ ] Tags
-
-[ ] Ratings
-
-[ ] Stats
-
-[ ] Metadata
-
-[ ] Dependencies
-
-[ ] Teams
-
-[ ] General
-
-[ ] Reports
-
-[ ] Batch
-
-[ ] Me
+- [X] Authentication (No Third-Party)
+- [X] Games
+- [X] Mods
+- [X] Files
+- [ ] Subscribe
+- [ ] Comments
+- [ ] Media
+- [ ] Events
+- [ ] Tags
+- [ ] Ratings
+- [ ] Stats
+- [ ] Metadata
+- [ ] Dependencies
+- [ ] Teams
+- [ ] General
+- [ ] Reports
+- [ ] Batch
+- [ ] Me
