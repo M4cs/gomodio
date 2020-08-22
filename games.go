@@ -1,4 +1,4 @@
-package games
+package gomodio
 
 import (
 	"encoding/json"
@@ -9,10 +9,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/M4cs/gomodio/pkg/errorhandling"
-	"github.com/M4cs/gomodio/pkg/helpers"
-	"github.com/M4cs/gomodio/pkg/user"
 )
 
 // Games struct which maps to the JSON response of Games/Edit in Get Game/s
@@ -86,9 +82,9 @@ type Game struct {
 }
 
 // GetGames from mod.io
-func GetGames(query map[string]string, user *user.User) (res *Games, err error) {
+func GetGames(query map[string]string, user *User) (res *Games, err error) {
 	query["api_key"] = user.APIKey()
-	queryString := helpers.ParseArgsGet(query)
+	queryString := ParseArgsGet(query)
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	req, err := http.NewRequest("GET", "https://api.mod.io/v1/games?"+queryString, nil)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -116,12 +112,12 @@ func GetGames(query map[string]string, user *user.User) (res *Games, err error) 
 }
 
 // EditGame function makes a PUT request and returns the updated Game Object
-func EditGame(gameID int, query map[string]string, user *user.User) (res *Game, err error) {
+func EditGame(gameID int, query map[string]string, user *User) (res *Game, err error) {
 	if user.OAuth2Token() != "" || len(user.OAuth2Token()) > 1 {
 		return nil, errors.New("requires OAuth2 token")
 	}
 	query["api_key"] = user.APIKey()
-	reqBody := helpers.ParseArgsBody(query)
+	reqBody := ParseArgsBody(query)
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	req, err := http.NewRequest("PUT", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID), strings.NewReader(reqBody.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -139,12 +135,12 @@ func EditGame(gameID int, query map[string]string, user *user.User) (res *Game, 
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode != 200 {
-		var errObj *errorhandling.ErrorCase
+		var errObj ErrorCase
 		e := json.Unmarshal(body, &errObj)
 		if e != nil {
 			log.Fatalln(e)
 		}
-		return nil, errorhandling.HandleResponseError(errObj)
+		return nil, HandleResponseError(errObj)
 	}
 	if err != nil {
 		return nil, err
@@ -157,11 +153,11 @@ func EditGame(gameID int, query map[string]string, user *user.User) (res *Game, 
 }
 
 // GetGame function returns a Game struct
-func GetGame(gameID int, query map[string]string, user *user.User) (res *Game, err error) {
+func GetGame(gameID int, query map[string]string, user *User) (res *Game, err error) {
 	var queryString string
 	if query != nil {
 		query["api_key"] = user.APIKey()
-		queryString = helpers.ParseArgsGet(query)
+		queryString = ParseArgsGet(query)
 	} else {
 		queryString = "api_key=" + user.APIKey()
 	}
@@ -182,12 +178,12 @@ func GetGame(gameID int, query map[string]string, user *user.User) (res *Game, e
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode != 200 {
-		var errObj *errorhandling.ErrorCase
+		var errObj ErrorCase
 		e := json.Unmarshal(body, &errObj)
 		if e != nil {
 			log.Fatalln(e)
 		}
-		return nil, errorhandling.HandleResponseError(errObj)
+		return nil, HandleResponseError(errObj)
 	}
 	if err != nil {
 		return nil, err

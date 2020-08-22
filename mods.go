@@ -1,4 +1,4 @@
-package mods
+package gomodio
 
 import (
 	"bytes"
@@ -14,10 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/M4cs/gomodio/pkg/errorhandling"
-	"github.com/M4cs/gomodio/pkg/helpers"
-	"github.com/M4cs/gomodio/pkg/user"
 )
 
 // Mods struct which maps to the JSON response of Get Mods
@@ -124,9 +120,9 @@ type Mod struct {
 }
 
 // GetMods searches for mods and returns a Mods object
-func GetMods(gameID int, query map[string]string, user *user.User) (res *Mods, err error) {
+func GetMods(gameID int, query map[string]string, user *User) (res *Mods, err error) {
 	query["api_key"] = user.APIKey()
-	queryString := helpers.ParseArgsGet(query)
+	queryString := ParseArgsGet(query)
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	req, err := http.NewRequest("GET", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods?"+queryString, nil)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -153,11 +149,11 @@ func GetMods(gameID int, query map[string]string, user *user.User) (res *Mods, e
 }
 
 // EditMod edits a mod
-func EditMod(modID int, gameID int, options map[string]string, user *user.User) (res *Mod, err error) {
+func EditMod(modID int, gameID int, options map[string]string, user *User) (res *Mod, err error) {
 	if user.OAuth2Token() == "" {
 		return res, errors.New("requires OAuth2 token")
 	}
-	reqBody := helpers.ParseArgsBody(options)
+	reqBody := ParseArgsBody(options)
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	req, err := http.NewRequest("PUT", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID), strings.NewReader(reqBody.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -184,7 +180,7 @@ func EditMod(modID int, gameID int, options map[string]string, user *user.User) 
 }
 
 // DeleteMod sends a request to delete a mod
-func DeleteMod(modID int, gameID int, user *user.User) (err error) {
+func DeleteMod(modID int, gameID int, user *User) (err error) {
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	req, err := http.NewRequest("DELETE", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID), nil)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -205,18 +201,18 @@ func DeleteMod(modID int, gameID int, user *user.User) (err error) {
 		return err
 	}
 	if resp.StatusCode != 204 {
-		var errObj *errorhandling.ErrorCase
+		var errObj ErrorCase
 		e := json.Unmarshal(body, &errObj)
 		if e != nil {
 			log.Fatalln(e)
 		}
-		return errorhandling.HandleResponseError(errObj)
+		return HandleResponseError(errObj)
 	}
 	return nil
 }
 
 // AddMod adds a mod taking bytes for files and returns Mod object
-func AddMod(logo string, modName string, summary string, options map[string]string, gameID int, user *user.User) (res *Mod, err error) {
+func AddMod(logo string, modName string, summary string, options map[string]string, gameID int, user *User) (res *Mod, err error) {
 	if user.OAuth2Token() == "" {
 		return res, errors.New("requires OAuth2 token")
 	}
@@ -258,12 +254,12 @@ func AddMod(logo string, modName string, summary string, options map[string]stri
 		return res, err
 	}
 	if resp.StatusCode != 200 {
-		var errObj *errorhandling.ErrorCase
+		var errObj ErrorCase
 		e := json.Unmarshal(b, &errObj)
 		if e != nil {
 			log.Fatalln(e)
 		}
-		return nil, errorhandling.HandleResponseError(errObj)
+		return nil, HandleResponseError(errObj)
 	}
 	err = json.Unmarshal(b, &res)
 	if err != nil {
@@ -273,11 +269,11 @@ func AddMod(logo string, modName string, summary string, options map[string]stri
 }
 
 // GetMod searches for a mod and returns a Mods object
-func GetMod(modID int, gameID int, query map[string]string, user *user.User) (res *Mods, err error) {
+func GetMod(modID int, gameID int, query map[string]string, user *User) (res *Mods, err error) {
 	var queryString string
 	if query != nil {
 		query["api_key"] = user.APIKey()
-		queryString = helpers.ParseArgsGet(query)
+		queryString = ParseArgsGet(query)
 	} else {
 		queryString = "api_key=" + user.APIKey()
 	}

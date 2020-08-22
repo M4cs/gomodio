@@ -1,4 +1,4 @@
-package helpers
+package gomodio
 
 import (
 	"net/url"

@@ -1,4 +1,4 @@
-package files
+package gomodio
 
 import (
 	"bytes"
@@ -14,10 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/M4cs/gomodio/pkg/errorhandling"
-	"github.com/M4cs/gomodio/pkg/helpers"
-	"github.com/M4cs/gomodio/pkg/user"
 )
 
 // Files struct which maps to the JSON of Get Files
@@ -53,9 +49,9 @@ type File struct {
 }
 
 // GetModfiles grabs modfiles and returns a Files struct
-func GetModfiles(modID int, gameID int, options map[string]string, user *user.User) (f *Files, err error) {
+func GetModfiles(modID int, gameID int, options map[string]string, user *User) (f *Files, err error) {
 	options["api_key"] = user.APIKey()
-	queryStr := helpers.ParseArgsGet(options)
+	queryStr := ParseArgsGet(options)
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	req, err := http.NewRequest("GET", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID)+"?"+queryStr, nil)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -72,12 +68,12 @@ func GetModfiles(modID int, gameID int, options map[string]string, user *user.Us
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode != 201 {
-		var errObj *errorhandling.ErrorCase
+		var errObj ErrorCase
 		e := json.Unmarshal(body, &errObj)
 		if e != nil {
 			log.Fatalln(e)
 		}
-		return nil, errorhandling.HandleResponseError(errObj)
+		return nil, HandleResponseError(errObj)
 	}
 	if err != nil {
 		return f, err
@@ -90,7 +86,7 @@ func GetModfiles(modID int, gameID int, options map[string]string, user *user.Us
 }
 
 // GetModfile grabs a modfile and returns a File struct
-func GetModfile(fileID int, modID int, gameID int, user *user.User) (f *File, err error) {
+func GetModfile(fileID int, modID int, gameID int, user *User) (f *File, err error) {
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	req, err := http.NewRequest("GET", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID)+"?api_key="+user.APIKey(), nil)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -110,12 +106,12 @@ func GetModfile(fileID int, modID int, gameID int, user *user.User) (f *File, er
 		return f, err
 	}
 	if resp.StatusCode != 200 {
-		var errObj *errorhandling.ErrorCase
+		var errObj ErrorCase
 		e := json.Unmarshal(body, &errObj)
 		if e != nil {
 			log.Fatalln(e)
 		}
-		return nil, errorhandling.HandleResponseError(errObj)
+		return nil, HandleResponseError(errObj)
 	}
 	err = json.Unmarshal(body, &f)
 	if err != nil {
@@ -125,12 +121,12 @@ func GetModfile(fileID int, modID int, gameID int, user *user.User) (f *File, er
 }
 
 // EditModfile sends a PUT request to edit a mod file
-func EditModfile(modID int, gameID int, options map[string]string, user *user.User) (f *File, err error) {
+func EditModfile(modID int, gameID int, options map[string]string, user *User) (f *File, err error) {
 	if user.OAuth2Token() == "" {
 		return f, errors.New("requires OAuth2 token")
 	}
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
-	reqBody := helpers.ParseArgsBody(options)
+	reqBody := ParseArgsBody(options)
 	req, err := http.NewRequest("PUT", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID)+"/files", strings.NewReader(reqBody.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	if err != nil {
@@ -149,12 +145,12 @@ func EditModfile(modID int, gameID int, options map[string]string, user *user.Us
 		return f, err
 	}
 	if resp.StatusCode != 200 {
-		var errObj *errorhandling.ErrorCase
+		var errObj ErrorCase
 		e := json.Unmarshal(b, &errObj)
 		if e != nil {
 			log.Fatalln(e)
 		}
-		return nil, errorhandling.HandleResponseError(errObj)
+		return nil, HandleResponseError(errObj)
 	}
 
 	err = json.Unmarshal(b, &f)
@@ -165,7 +161,7 @@ func EditModfile(modID int, gameID int, options map[string]string, user *user.Us
 }
 
 // DeleteModfile sends a DELETE request to delete a mod file
-func DeleteModfile(fileID int, modID int, gameID int, user *user.User) (err error) {
+func DeleteModfile(fileID int, modID int, gameID int, user *User) (err error) {
 	if user.OAuth2Token() == "" {
 		return errors.New("requires OAuth2 token")
 	}
@@ -188,18 +184,18 @@ func DeleteModfile(fileID int, modID int, gameID int, user *user.User) (err erro
 		return err
 	}
 	if resp.StatusCode != 204 {
-		var errObj *errorhandling.ErrorCase
+		var errObj ErrorCase
 		e := json.Unmarshal(b, &errObj)
 		if e != nil {
 			log.Fatalln(e)
 		}
-		return errorhandling.HandleResponseError(errObj)
+		return HandleResponseError(errObj)
 	}
 	return nil
 }
 
 // AddModfile sends a POST request to upload a mod file
-func AddModfile(modID int, gameID int, fp string, options map[string]string, user *user.User) (f *File, err error) {
+func AddModfile(modID int, gameID int, fp string, options map[string]string, user *User) (f *File, err error) {
 	if user.OAuth2Token() == "" {
 		return f, errors.New("requires OAuth2 token")
 	}
@@ -239,12 +235,12 @@ func AddModfile(modID int, gameID int, fp string, options map[string]string, use
 		return f, err
 	}
 	if resp.StatusCode != 201 {
-		var errObj *errorhandling.ErrorCase
+		var errObj ErrorCase
 		e := json.Unmarshal(b, &errObj)
 		if e != nil {
 			log.Fatalln(e)
 		}
-		return nil, errorhandling.HandleResponseError(errObj)
+		return nil, HandleResponseError(errObj)
 	}
 	err = json.Unmarshal(b, &f)
 	if err != nil {

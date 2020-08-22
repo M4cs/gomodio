@@ -1,4 +1,4 @@
-package user
+package gomodio
 
 import (
 	"encoding/json"
@@ -29,18 +29,23 @@ func NewUser(apikey string, email string) *User {
 	return &User{apikey, email, ""}
 }
 
+// APIKey returns the User's API key
 func (u *User) APIKey() string {
 	return u.apikey
 }
 
+// Email returns the User's Email
 func (u *User) Email() string {
 	return u.email
 }
 
+// OAuth2Token returns the User's OAuth2Token
 func (u *User) OAuth2Token() string {
 	return u.oauth2token
 }
 
+// SetOAuth2Token sets a User's OAuth2Token
+// token is the OAuth2 Token from mod.io
 func (u *User) SetOAuth2Token(token string) {
 	u.oauth2token = token
 }

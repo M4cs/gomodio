@@ -1,4 +1,14 @@
-package subscribe
+package gomodio
+
+import (
+	"encoding/json"
+	"errors"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"strconv"
+	"time"
+)
 
 // Subscribe Struct Maps to JSON Response for Subscribing
 type Subscribe struct {
@@ -92,4 +102,76 @@ type Subscribe struct {
 		RatingsDisplayText        string  `json:"ratings_display_text"`
 		DateExpires               int     `json:"date_expires"`
 	} `json:"stats"`
+}
+
+// SubscribeToMod sends a request to subscribe to a mod
+func SubscribeToMod(modID, gameID int, user *User) (s *Subscribe, err error) {
+	if user.OAuth2Token() == "" {
+		return s, errors.New("requires OAuth2 token")
+	}
+	client := http.Client{Timeout: time.Duration(5 * time.Second)}
+
+	req, err := http.NewRequest("POST", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID)+"/subscribe", nil)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Authorization", "Bearer "+user.OAuth2Token())
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != 201 {
+		var errObj ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, HandleResponseError(errObj)
+	}
+	err = json.Unmarshal(body, &s)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+// UnsubscribeToMod sends a request to subscribe to a mod
+func UnsubscribeToMod(modID, gameID int, user *User) (err error) {
+	if user.OAuth2Token() == "" {
+		return errors.New("requires OAuth2 token")
+	}
+	client := http.Client{Timeout: time.Duration(5 * time.Second)}
+
+	req, err := http.NewRequest("DELETE", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID)+"/subscribe", nil)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Authorization", "Bearer "+user.OAuth2Token())
+	if err != nil {
+		return err
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 201 {
+		var errObj ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return HandleResponseError(errObj)
+	}
+	return nil
 }
