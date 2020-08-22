@@ -42,7 +42,7 @@ func main() {
 - [X] Games
 - [X] Mods
 - [X] Files
-- [ ] Subscribe
+- [X] Subscribe
 - [ ] Comments
 - [ ] Media
 - [ ] Events
