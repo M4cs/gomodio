@@ -16,8 +16,8 @@ import (
 	"time"
 )
 
-// Files struct which maps to the JSON of Get Files
-type Files struct {
+// Modfiles struct which maps to the JSON of Get Modfiles
+type Modfiles struct {
 	Data         []File `json:"data"`
 	ResultCount  int    `json:"result_count"`
 	ResultLimit  int    `json:"result_limit"`
@@ -48,8 +48,8 @@ type File struct {
 	} `json:"download"`
 }
 
-// GetModfiles grabs modfiles and returns a Files struct
-func GetModfiles(modID int, gameID int, options map[string]string, user *User) (f *Files, err error) {
+// GetModfiles grabs modfiles and returns a Modfiles struct
+func GetModfiles(modID int, gameID int, options map[string]string, user *User) (f *Modfiles, err error) {
 	options["api_key"] = user.APIKey()
 	queryStr := ParseArgsGet(options)
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
