@@ -218,7 +218,7 @@ func AddModfile(modID int, gameID int, fp string, options map[string]string, use
 	}
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	req, err := http.NewRequest("POST", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID)+"/files", body)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Content-Type", "multipart/form-data")
 	if err != nil {
 		return f, err
 	}

@@ -43,9 +43,9 @@ func main() {
 - [X] Mods
 - [X] Files
 - [X] Subscribe
-- [ ] Comments
-- [ ] Media
-- [ ] Events
+- [X] Comments
+- [X] Media
+- [X] Events
 - [ ] Tags
 - [ ] Ratings
 - [ ] Stats
