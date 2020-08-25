@@ -24,7 +24,7 @@ type Message struct {
 }
 
 // DeleteModMedia deletes mod media
-func DeleteModMedia(modID, gameID int, options map[string]string, user *User) (err error) {
+func (user *User) DeleteModMedia(modID, gameID int, options map[string]string) (err error) {
 	var reqBody url.Values
 	if options == nil {
 		return errors.New("must provide options. cannot be nil")
@@ -62,7 +62,7 @@ func DeleteModMedia(modID, gameID int, options map[string]string, user *User) (e
 }
 
 // AddModMedia adds mod media
-func AddModMedia(modID, gameID int, options map[string]string, user *User) (msg *Message, err error) {
+func (user *User) AddModMedia(modID, gameID int, options map[string]string) (msg *Message, err error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	if options != nil {
@@ -117,7 +117,7 @@ func AddModMedia(modID, gameID int, options map[string]string, user *User) (msg 
 }
 
 // AddGameMedia adds game media
-func AddGameMedia(logo, icon, header string, gameID int, user *User) (msg *Message, err error) {
+func (user *User) AddGameMedia(logo, icon, header string, gameID int) (msg *Message, err error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	file, err := os.Open(logo)

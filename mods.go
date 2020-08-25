@@ -120,7 +120,7 @@ type Mod struct {
 }
 
 // GetMods searches for mods and returns a Mods object
-func GetMods(gameID int, query map[string]string, user *User) (res *Mods, err error) {
+func (user *User) GetMods(gameID int, query map[string]string) (res *Mods, err error) {
 	query["api_key"] = user.APIKey()
 	queryString := ParseArgsGet(query)
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
@@ -138,6 +138,14 @@ func GetMods(gameID int, query map[string]string, user *User) (res *Mods, err er
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		var errObj ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, HandleResponseError(errObj)
+	}
 	if err != nil {
 		return res, err
 	}
@@ -149,7 +157,7 @@ func GetMods(gameID int, query map[string]string, user *User) (res *Mods, err er
 }
 
 // EditMod edits a mod
-func EditMod(modID int, gameID int, options map[string]string, user *User) (res *Mod, err error) {
+func (user *User) EditMod(modID int, gameID int, options map[string]string) (res *Mod, err error) {
 	if user.OAuth2Token() == "" {
 		return res, errors.New("requires OAuth2 token")
 	}
@@ -169,6 +177,14 @@ func EditMod(modID int, gameID int, options map[string]string, user *User) (res 
 	}
 	defer resp.Body.Close()
 	b, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		var errObj ErrorCase
+		e := json.Unmarshal(b, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, HandleResponseError(errObj)
+	}
 	if err != nil {
 		return res, err
 	}
@@ -180,7 +196,7 @@ func EditMod(modID int, gameID int, options map[string]string, user *User) (res 
 }
 
 // DeleteMod sends a request to delete a mod
-func DeleteMod(modID int, gameID int, user *User) (err error) {
+func (user *User) DeleteMod(modID int, gameID int) (err error) {
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	req, err := http.NewRequest("DELETE", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID), nil)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -212,7 +228,7 @@ func DeleteMod(modID int, gameID int, user *User) (err error) {
 }
 
 // AddMod adds a mod taking bytes for files and returns Mod object
-func AddMod(logo string, modName string, summary string, options map[string]string, gameID int, user *User) (res *Mod, err error) {
+func (user *User) AddMod(logo string, modName string, summary string, options map[string]string, gameID int) (res *Mod, err error) {
 	if user.OAuth2Token() == "" {
 		return res, errors.New("requires OAuth2 token")
 	}
@@ -253,7 +269,7 @@ func AddMod(logo string, modName string, summary string, options map[string]stri
 	if err != nil {
 		return res, err
 	}
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != 201 {
 		var errObj ErrorCase
 		e := json.Unmarshal(b, &errObj)
 		if e != nil {
@@ -269,7 +285,7 @@ func AddMod(logo string, modName string, summary string, options map[string]stri
 }
 
 // GetMod searches for a mod and returns a Mods object
-func GetMod(modID int, gameID int, query map[string]string, user *User) (res *Mods, err error) {
+func (user *User) GetMod(modID int, gameID int, query map[string]string) (res *Mods, err error) {
 	var queryString string
 	if query != nil {
 		query["api_key"] = user.APIKey()
@@ -292,6 +308,14 @@ func GetMod(modID int, gameID int, query map[string]string, user *User) (res *Mo
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		var errObj ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, HandleResponseError(errObj)
+	}
 	if err != nil {
 		return res, err
 	}

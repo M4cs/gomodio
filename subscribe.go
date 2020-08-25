@@ -105,7 +105,7 @@ type Subscribe struct {
 }
 
 // SubscribeToMod sends a request to subscribe to a mod
-func SubscribeToMod(modID, gameID int, user *User) (s *Subscribe, err error) {
+func (user *User) SubscribeToMod(modID, gameID int) (s *Subscribe, err error) {
 	if user.OAuth2Token() == "" {
 		return s, errors.New("requires OAuth2 token")
 	}
@@ -143,7 +143,7 @@ func SubscribeToMod(modID, gameID int, user *User) (s *Subscribe, err error) {
 }
 
 // UnsubscribeToMod sends a request to subscribe to a mod
-func UnsubscribeToMod(modID, gameID int, user *User) (err error) {
+func (user *User) UnsubscribeToMod(modID, gameID int) (err error) {
 	if user.OAuth2Token() == "" {
 		return errors.New("requires OAuth2 token")
 	}

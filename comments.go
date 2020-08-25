@@ -117,7 +117,7 @@ func UpdateModComment(content string, commentID, modID, gameID int, user *User) 
 }
 
 // AddModComment adds a mod comment
-func AddModComment(content string, modID, gameID int, options map[string]string, user *User) (res *Comment, err error) {
+func (user *User) AddModComment(content string, modID, gameID int, options map[string]string) (res *Comment, err error) {
 	var queryBody url.Values
 	if options != nil {
 		queryBody = ParseArgsBody(options)
@@ -161,7 +161,7 @@ func AddModComment(content string, modID, gameID int, options map[string]string,
 }
 
 // GetModComment searches for a mod comment specifically
-func GetModComment(commentID int, modID int, gameID int, user *User) (res *Comment, err error) {
+func (user *User) GetModComment(commentID int, modID int, gameID int) (res *Comment, err error) {
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	req, err := http.NewRequest("GET", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID)+"/comments/"+strconv.Itoa(commentID)+"?api_key="+user.APIKey(), nil)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -196,7 +196,7 @@ func GetModComment(commentID int, modID int, gameID int, user *User) (res *Comme
 }
 
 // GetModComments searches for mod comments
-func GetModComments(modID int, gameID int, options map[string]string, user *User) (res *Comments, err error) {
+func (user *User) GetModComments(modID int, gameID int, options map[string]string) (res *Comments, err error) {
 	var queryStr string
 	if options == nil {
 		queryStr = "api_key=" + user.APIKey()

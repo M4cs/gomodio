@@ -82,7 +82,7 @@ type Game struct {
 }
 
 // GetGames from mod.io
-func GetGames(query map[string]string, user *User) (res *Games, err error) {
+func (user *User) GetGames(query map[string]string) (res *Games, err error) {
 	query["api_key"] = user.APIKey()
 	queryString := ParseArgsGet(query)
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
@@ -100,6 +100,14 @@ func GetGames(query map[string]string, user *User) (res *Games, err error) {
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		var errObj ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, HandleResponseError(errObj)
+	}
 	if err != nil {
 		return res, err
 	}
@@ -112,7 +120,7 @@ func GetGames(query map[string]string, user *User) (res *Games, err error) {
 }
 
 // EditGame function makes a PUT request and returns the updated Game Object
-func EditGame(gameID int, query map[string]string, user *User) (res *Game, err error) {
+func (user *User) EditGame(gameID int, query map[string]string) (res *Game, err error) {
 	if user.OAuth2Token() != "" || len(user.OAuth2Token()) > 1 {
 		return nil, errors.New("requires OAuth2 token")
 	}
@@ -153,7 +161,7 @@ func EditGame(gameID int, query map[string]string, user *User) (res *Game, err e
 }
 
 // GetGame function returns a Game struct
-func GetGame(gameID int, query map[string]string, user *User) (res *Game, err error) {
+func (user *User) GetGame(gameID int, query map[string]string) (res *Game, err error) {
 	var queryString string
 	if query != nil {
 		query["api_key"] = user.APIKey()

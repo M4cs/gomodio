@@ -195,7 +195,7 @@ func DeleteModfile(fileID int, modID int, gameID int, user *User) (err error) {
 }
 
 // AddModfile sends a POST request to upload a mod file
-func AddModfile(modID int, gameID int, fp string, options map[string]string, user *User) (f *File, err error) {
+func (user *User) AddModfile(modID int, gameID int, fp string, options map[string]string) (f *File, err error) {
 	if user.OAuth2Token() == "" {
 		return f, errors.New("requires OAuth2 token")
 	}

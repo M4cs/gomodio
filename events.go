@@ -3,6 +3,7 @@ package gomodio
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -27,7 +28,7 @@ type Event struct {
 }
 
 // GetModsEvents gets all mods events
-func GetModsEvents(gameID int, options map[string]string, user *User) (e *Events, err error) {
+func (user *User) GetModsEvents(gameID int, options map[string]string) (e *Events, err error) {
 	var queryStr string
 	if options != nil {
 		options["api_key"] = user.APIKey()
@@ -50,6 +51,14 @@ func GetModsEvents(gameID int, options map[string]string, user *User) (e *Events
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		var errObj ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, HandleResponseError(errObj)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +70,7 @@ func GetModsEvents(gameID int, options map[string]string, user *User) (e *Events
 }
 
 // GetModEvents gets a single mod's events
-func GetModEvents(gameID int, modID int, user *User) (e *Events, err error) {
+func (user *User) GetModEvents(gameID int, modID int) (e *Events, err error) {
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	req, err := http.NewRequest("GET", "https://api.mod.io/v1/games/"+strconv.Itoa(gameID)+"/mods/"+strconv.Itoa(modID)+"/events", nil)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -77,6 +86,14 @@ func GetModEvents(gameID int, modID int, user *User) (e *Events, err error) {
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		var errObj ErrorCase
+		e := json.Unmarshal(body, &errObj)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		return nil, HandleResponseError(errObj)
+	}
 	if err != nil {
 		return nil, err
 	}
