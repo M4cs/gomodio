@@ -14,9 +14,11 @@ go get -u github.com/M4cs/gomodio
 ### Basic Usage w/ API Key (Read Only Access)
 
 ```go
-package 
+package main
 
 import (
+    "fmt"
+
     "github.com/M4cs/gomodio"
 )
 
@@ -25,13 +27,19 @@ func main() {
     user := gomodio.NewUser("YOUR_API_KEY", "YOUR_EMAIL")
 
     // Search for games
-    games, _ := gomodio.GetGames(map[string]string{"q": "Skater XL"}, user)
+    games, err := user.GetGames(map[string]string{"q": "Skater XL"})
+    if err != nil {
+        fmt.Println(err.Error())
+    }
     for _, g := range games.Data {
         fmt.Println("Name:", g.Name)
         fmt.Println("Summary:", g.Summary)
     }
     // Grab Game Object
-    game, _ := gomodio.GetGame(games.Data[0].ID, nil, user)
+    game, err := user.GetGame(games.Data[0].ID, nil)
+    if err != nil {
+        fmt.Println(err.Error())
+    }
     fmt.Println(game.ID)
 }
 ```
@@ -46,7 +54,7 @@ func main() {
 - [X] Comments
 - [X] Media
 - [X] Events
-- [ ] Tags
+- [X] Tags
 - [ ] Ratings
 - [ ] Stats
 - [ ] Metadata
