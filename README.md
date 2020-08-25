@@ -1,6 +1,8 @@
 # gomodio
 ### A wrapper for mod.io in Golang
 
+<a href="https://goreportcard.com/report/github.com/M4cs/gomodio"><img src="https://goreportcard.com/badge/github.com/M4cs/gomodio"></a>
+
 #### (This is still a work in progress. See below for completion amount)
 
 ## Installation
