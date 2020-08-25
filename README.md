@@ -48,6 +48,7 @@ func main() {
 
 ## Completion
 
+### Code
 - [X] Authentication (No Third-Party)
 - [X] Games
 - [X] Mods
@@ -66,3 +67,8 @@ func main() {
 - [ ] Reports
 - [ ] Batch
 - [ ] Me
+
+### Documentation
+- [X] Basic exportation documentation
+- [ ] Pretty Godocs
+- [ ] Examples
