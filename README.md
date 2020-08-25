@@ -73,4 +73,4 @@ func main() {
 ### Documentation
 - [X] Basic exportation documentation
 - [ ] Pretty Godocs
-- [ ] Examples
+- [/] Examples
