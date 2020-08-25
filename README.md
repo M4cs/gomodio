@@ -55,9 +55,9 @@ func main() {
 - [X] Media
 - [X] Events
 - [X] Tags
-- [ ] Ratings
-- [ ] Stats
-- [ ] Metadata
+- [X] Ratings
+- [X] Stats
+- [X] Metadata
 - [ ] Dependencies
 - [ ] Teams
 - [ ] General
