@@ -3,6 +3,8 @@
 
 <a href="https://goreportcard.com/report/github.com/M4cs/gomodio"><img src="https://goreportcard.com/badge/github.com/M4cs/gomodio"></a>
 
+[See the mod.io Documentation Here](https://docs.mod.io/)
+
 #### (This is still a work in progress. See below for completion amount)
 
 ## Installation
