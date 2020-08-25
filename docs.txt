@@ -1,0 +1,617 @@
+
+package gomodio // import "github.com/M4cs/gomodio"
+
+
+FUNCTIONS
+
+func DeleteModComment(commentID, modID, gameID int, user *User) (err error)
+    DeleteModComment deletes an existing mod comment
+
+func DeleteModfile(fileID int, modID int, gameID int, user *User) (err error)
+    DeleteModfile sends a DELETE request to delete a mod file
+
+func HandleResponseError(e ErrorCase) (err error)
+    HandleResponseError checks for detailed codes and returns a detailed error
+    response
+
+func ParseArgsBody(query map[string]string) url.Values
+    ParseArgsBody parses a map for POST/PUT/DELETE requests and returns a
+    request body
+
+func ParseArgsGet(query map[string]string) string
+    ParseArgsGet parses a map for GET requests and returns a query string
+
+
+TYPES
+
+type Comment struct {
+	ID    int `json:"id"`
+	ModID int `json:"mod_id"`
+	User  struct {
+		ID         int    `json:"id"`
+		NameID     string `json:"name_id"`
+		Username   string `json:"username"`
+		DateOnline int    `json:"date_online"`
+		Avatar     struct {
+			Filename     string `json:"filename"`
+			Original     string `json:"original"`
+			Thumb50X50   string `json:"thumb_50x50"`
+			Thumb100X100 string `json:"thumb_100x100"`
+		} `json:"avatar"`
+		Timezone   string `json:"timezone"`
+		Language   string `json:"language"`
+		ProfileURL string `json:"profile_url"`
+	} `json:"user"`
+	DateAdded      int    `json:"date_added"`
+	ReplyID        int    `json:"reply_id"`
+	ThreadPosition string `json:"thread_position"`
+	Karma          int    `json:"karma"`
+	KarmaGuest     int    `json:"karma_guest"`
+	Content        string `json:"content"`
+}
+    Comment struct representing single comment objects
+
+func UpdateModComment(content string, commentID, modID, gameID int, user *User) (res *Comment, err error)
+    UpdateModComment updates an existing mod comment
+
+type Comments struct {
+	Data         []Comment `json:"data"`
+	ResultCount  int       `json:"result_count"`
+	ResultOffset int       `json:"result_offset"`
+	ResultLimit  int       `json:"result_limit"`
+	ResultTotal  int       `json:"result_total"`
+}
+    Comments struct representing the JSON response of Get Comments
+
+type Error struct {
+	Code    int    `json:"error_ref"`
+	Message string `json:"message"`
+}
+    Error for gomodio
+
+type ErrorCase struct {
+	Error Error `json:"error"`
+}
+    ErrorCase for gomodio
+
+type Event struct {
+	ID        int    `json:"id"`
+	ModID     int    `json:"mod_id"`
+	UserID    int    `json:"user_id"`
+	DateAdded int    `json:"date_added"`
+	EventType string `json:"event_type"`
+}
+    Event struct represents the event object of mod.io's API
+
+type Events struct {
+	Data         []Event `json:"data"`
+	ResultCount  int     `json:"result_count"`
+	ResultOffset int     `json:"result_offset"`
+	ResultLimit  int     `json:"result_limit"`
+	ResultTotal  int     `json:"result_total"`
+}
+    Events struct represents the events object of mod.io's API
+
+type ExchangeResponse struct {
+	OAuthToken string `json:"access_token"`
+	Code       int    `json:"code"`
+}
+    ExchangeResponse Struct for Response of Email Exchange
+
+type File struct {
+	ID             int    `json:"id"`
+	ModID          int    `json:"mod_id"`
+	DateAdded      int    `json:"date_added"`
+	DateScanned    int    `json:"date_scanned"`
+	VirusStatus    int    `json:"virus_status"`
+	VirusPositive  int    `json:"virus_positive"`
+	VirustotalHash string `json:"virustotal_hash"`
+	Filesize       int    `json:"filesize"`
+	Filehash       struct {
+		Md5 string `json:"md5"`
+	} `json:"filehash"`
+	Filename     string `json:"filename"`
+	Version      string `json:"version"`
+	Changelog    string `json:"changelog"`
+	MetadataBlob string `json:"metadata_blob"`
+	Download     struct {
+		BinaryURL   string `json:"binary_url"`
+		DateExpires int    `json:"date_expires"`
+	} `json:"download"`
+}
+    File struct which maps to the JSON of Get/Add/Delete File
+
+func EditModfile(modID int, gameID int, options map[string]string, user *User) (f *File, err error)
+    EditModfile sends a PUT request to edit a mod file
+
+func GetModfile(fileID int, modID int, gameID int, user *User) (f *File, err error)
+    GetModfile grabs a modfile and returns a File struct
+
+type Game struct {
+	ID          int `json:"id"`
+	Status      int `json:"status"`
+	SubmittedBy struct {
+		ID         int    `json:"id"`
+		NameID     string `json:"name_id"`
+		Username   string `json:"username"`
+		DateOnline int    `json:"date_online"`
+		Avatar     struct {
+			Filename     string `json:"filename"`
+			Original     string `json:"original"`
+			Thumb50X50   string `json:"thumb_50x50"`
+			Thumb100X100 string `json:"thumb_100x100"`
+		} `json:"avatar"`
+		Timezone   string `json:"timezone"`
+		Language   string `json:"language"`
+		ProfileURL string `json:"profile_url"`
+	} `json:"submitted_by"`
+	DateAdded          int    `json:"date_added"`
+	DateUpdated        int    `json:"date_updated"`
+	DateLive           int    `json:"date_live"`
+	PresentationOption int    `json:"presentation_option"`
+	SubmissionOption   int    `json:"submission_option"`
+	CurationOption     int    `json:"curation_option"`
+	CommunityOptions   int    `json:"community_options"`
+	RevenueOptions     int    `json:"revenue_options"`
+	APIAccessOptions   int    `json:"api_access_options"`
+	MaturityOptions    int    `json:"maturity_options"`
+	UgcName            string `json:"ugc_name"`
+	Icon               struct {
+		Filename     string `json:"filename"`
+		Original     string `json:"original"`
+		Thumb64X64   string `json:"thumb_64x64"`
+		Thumb128X128 string `json:"thumb_128x128"`
+		Thumb256X256 string `json:"thumb_256x256"`
+	} `json:"icon"`
+	Logo struct {
+		Filename      string `json:"filename"`
+		Original      string `json:"original"`
+		Thumb320X180  string `json:"thumb_320x180"`
+		Thumb640X360  string `json:"thumb_640x360"`
+		Thumb1280X720 string `json:"thumb_1280x720"`
+	} `json:"logo"`
+	Header struct {
+		Filename string `json:"filename"`
+		Original string `json:"original"`
+	} `json:"header"`
+	Name            string `json:"name"`
+	NameID          string `json:"name_id"`
+	Summary         string `json:"summary"`
+	Instructions    string `json:"instructions"`
+	InstructionsURL string `json:"instructions_url"`
+	ProfileURL      string `json:"profile_url"`
+	TagOptions      []struct {
+		Name   string   `json:"name"`
+		Type   string   `json:"type"`
+		Tags   []string `json:"tags"`
+		Hidden bool     `json:"hidden"`
+	} `json:"tag_options"`
+}
+    Game struct which maps to the JSON response of Get/Edit Game/s
+
+func (g *Game) ToJSON() (jsonStr string, err error)
+    ToJSON returns JSON string of Game struct
+
+type GameStats struct {
+	GameID                    int `json:"game_id"`
+	ModsCountTotal            int `json:"mods_count_total"`
+	ModsDownloadsToday        int `json:"mods_downloads_today"`
+	ModsDownloadsTotal        int `json:"mods_downloads_total"`
+	ModsDownloadsDailyAverage int `json:"mods_downloads_daily_average"`
+	ModsSubscribersTotal      int `json:"mods_subscribers_total"`
+	DateExpires               int `json:"date_expires"`
+}
+    GameStats struct represents a game's stats
+
+type GameTags struct {
+	Name   string   `json:"name"`
+	Type   string   `json:"type"`
+	Tags   []string `json:"string"`
+	Hidden bool     `json:"bool"`
+}
+    GameTags struct is a game's tags object
+
+type Games struct {
+	Data        []Game `json:"data"`
+	ResultCount int    `json:"result_count"`
+	ResultLimit int    `json:"result_limit"`
+	ResultTotal int    `json:"result_total"`
+}
+    Games struct which maps to the JSON response of Games/Edit in Get Game/s
+
+func (g *Games) ToJSON() (jsonStr string, err error)
+    ToJSON returns JSON string of Games struct
+
+type Message struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+    Message struct represents a message object in JSON
+
+type Mod struct {
+	ID          int `json:"id"`
+	GameID      int `json:"game_id"`
+	Status      int `json:"status"`
+	Visible     int `json:"visible"`
+	SubmittedBy struct {
+		ID         int    `json:"id"`
+		NameID     string `json:"name_id"`
+		Username   string `json:"username"`
+		DateOnline int    `json:"date_online"`
+		Avatar     struct {
+			Filename     string `json:"filename"`
+			Original     string `json:"original"`
+			Thumb50X50   string `json:"thumb_50x50"`
+			Thumb100X100 string `json:"thumb_100x100"`
+		} `json:"avatar"`
+		Timezone   string `json:"timezone"`
+		Language   string `json:"language"`
+		ProfileURL string `json:"profile_url"`
+	} `json:"submitted_by"`
+	DateAdded      int `json:"date_added"`
+	DateUpdated    int `json:"date_updated"`
+	DateLive       int `json:"date_live"`
+	MaturityOption int `json:"maturity_option"`
+	Logo           struct {
+		Filename      string `json:"filename"`
+		Original      string `json:"original"`
+		Thumb320X180  string `json:"thumb_320x180"`
+		Thumb640X360  string `json:"thumb_640x360"`
+		Thumb1280X720 string `json:"thumb_1280x720"`
+	} `json:"logo"`
+	HomepageURL          string `json:"homepage_url"`
+	Name                 string `json:"name"`
+	NameID               string `json:"name_id"`
+	Summary              string `json:"summary"`
+	Description          string `json:"description"`
+	DescriptionPlaintext string `json:"description_plaintext"`
+	MetadataBlob         string `json:"metadata_blob"`
+	ProfileURL           string `json:"profile_url"`
+	Media                struct {
+		Youtube   []string `json:"youtube"`
+		Sketchfab []string `json:"sketchfab"`
+		Images    []struct {
+			Filename     string `json:"filename"`
+			Original     string `json:"original"`
+			Thumb320X180 string `json:"thumb_320x180"`
+		} `json:"images"`
+	} `json:"media"`
+	Modfile struct {
+		ID             int    `json:"id"`
+		ModID          int    `json:"mod_id"`
+		DateAdded      int    `json:"date_added"`
+		DateScanned    int    `json:"date_scanned"`
+		VirusStatus    int    `json:"virus_status"`
+		VirusPositive  int    `json:"virus_positive"`
+		VirustotalHash string `json:"virustotal_hash"`
+		Filesize       int    `json:"filesize"`
+		Filehash       struct {
+			Md5 string `json:"md5"`
+		} `json:"filehash"`
+		Filename     string `json:"filename"`
+		Version      string `json:"version"`
+		Changelog    string `json:"changelog"`
+		MetadataBlob string `json:"metadata_blob"`
+		Download     struct {
+			BinaryURL   string `json:"binary_url"`
+			DateExpires int    `json:"date_expires"`
+		} `json:"download"`
+	} `json:"modfile"`
+	MetadataKvp []struct {
+		Metakey   string `json:"metakey"`
+		Metavalue string `json:"metavalue"`
+	} `json:"metadata_kvp"`
+	Tags []struct {
+		Name      string `json:"name"`
+		DateAdded int    `json:"date_added"`
+	} `json:"tags"`
+	Stats struct {
+		ModID                     int     `json:"mod_id"`
+		PopularityRankPosition    int     `json:"popularity_rank_position"`
+		PopularityRankTotalMods   int     `json:"popularity_rank_total_mods"`
+		DownloadsTotal            int     `json:"downloads_total"`
+		SubscribersTotal          int     `json:"subscribers_total"`
+		RatingsTotal              int     `json:"ratings_total"`
+		RatingsPositive           int     `json:"ratings_positive"`
+		RatingsNegative           int     `json:"ratings_negative"`
+		RatingsPercentagePositive int     `json:"ratings_percentage_positive"`
+		RatingsWeightedAggregate  float64 `json:"ratings_weighted_aggregate"`
+		RatingsDisplayText        string  `json:"ratings_display_text"`
+		DateExpires               int     `json:"date_expires"`
+	} `json:"stats"`
+}
+    Mod struct which maps to the JSON response of Get/Edit/Add/Delete Mod/s
+
+type ModKVP struct {
+	Metakey   string `json:"metakey"`
+	Metavalue string `json:"metavalue"`
+}
+    ModKVP represents a mod's KVP metadata
+
+type ModMetadata struct {
+	Data         []ModKVP `json:"data"`
+	ResultCount  int      `json:"result_count"`
+	ResultLimit  int      `json:"result_limit"`
+	ResultTotal  int      `json:"result_total"`
+	ResultOffset int      `json:"result_offset"`
+}
+    ModMetadata respesents multiple KVP metadata objects
+
+type ModStats struct {
+	Data         []Stats `json:"data"`
+	ResultCount  int     `json:"result_count"`
+	ResultLimit  int     `json:"result_limit"`
+	ResultTotal  int     `json:"result_total"`
+	ResultOffset int     `json:"result_offset"`
+}
+    ModStats struct represents a group of stats of a mod
+
+type Modfiles struct {
+	Data         []File `json:"data"`
+	ResultCount  int    `json:"result_count"`
+	ResultLimit  int    `json:"result_limit"`
+	ResultTotal  int    `json:"result_total"`
+	ResultOffset int    `json:"result_offset"`
+}
+    Modfiles struct which maps to the JSON of Get Modfiles
+
+func GetModfiles(modID int, gameID int, options map[string]string, user *User) (f *Modfiles, err error)
+    GetModfiles grabs modfiles and returns a Modfiles struct
+
+type Mods struct {
+	Data         []Mod `json:"data"`
+	ResultCount  int   `json:"result_count"`
+	ResultLimit  int   `json:"result_limit"`
+	ResultTotal  int   `json:"result_total"`
+	ResultOffset int   `json:"result_offset"`
+}
+    Mods struct which maps to the JSON response of Get Mods
+
+type Stats struct {
+	ModID                     int     `json:"mod_id"`
+	PopularityRankPosition    int     `json:"popularity_rank_position"`
+	PopularityRankTotalMods   int     `json:"popularity_rank_total_mods"`
+	DownloadsTotal            int     `json:"downloads_total"`
+	SubscribersTotal          int     `json:"subscribers_total"`
+	RatingsTotal              int     `json:"ratings_total"`
+	RatingsPositive           int     `json:"ratings_positive"`
+	RatingsNegative           int     `json:"ratings_negative"`
+	RatingsPercentagePositive int     `json:"ratings_percentage_positive"`
+	RatingsWeightedAggregate  float64 `json:"ratings_weighted_aggregate"`
+	RatingsDisplayText        string  `json:"ratings_display_text"`
+	DateExpires               int     `json:"date_expires"`
+}
+    Stats struct represents a stats object
+
+type Subscribe struct {
+	ID          int `json:"id"`
+	GameID      int `json:"game_id"`
+	Status      int `json:"status"`
+	Visible     int `json:"visible"`
+	SubmittedBy struct {
+		ID         int    `json:"id"`
+		NameID     string `json:"name_id"`
+		Username   string `json:"username"`
+		DateOnline int    `json:"date_online"`
+		Avatar     struct {
+			Filename     string `json:"filename"`
+			Original     string `json:"original"`
+			Thumb50X50   string `json:"thumb_50x50"`
+			Thumb100X100 string `json:"thumb_100x100"`
+		} `json:"avatar"`
+		Timezone   string `json:"timezone"`
+		Language   string `json:"language"`
+		ProfileURL string `json:"profile_url"`
+	} `json:"submitted_by"`
+	DateAdded      int `json:"date_added"`
+	DateUpdated    int `json:"date_updated"`
+	DateLive       int `json:"date_live"`
+	MaturityOption int `json:"maturity_option"`
+	Logo           struct {
+		Filename      string `json:"filename"`
+		Original      string `json:"original"`
+		Thumb320X180  string `json:"thumb_320x180"`
+		Thumb640X360  string `json:"thumb_640x360"`
+		Thumb1280X720 string `json:"thumb_1280x720"`
+	} `json:"logo"`
+	HomepageURL          string `json:"homepage_url"`
+	Name                 string `json:"name"`
+	NameID               string `json:"name_id"`
+	Summary              string `json:"summary"`
+	Description          string `json:"description"`
+	DescriptionPlaintext string `json:"description_plaintext"`
+	MetadataBlob         string `json:"metadata_blob"`
+	ProfileURL           string `json:"profile_url"`
+	Media                struct {
+		Youtube   []string `json:"youtube"`
+		Sketchfab []string `json:"sketchfab"`
+		Images    []struct {
+			Filename     string `json:"filename"`
+			Original     string `json:"original"`
+			Thumb320X180 string `json:"thumb_320x180"`
+		} `json:"images"`
+	} `json:"media"`
+	Modfile struct {
+		ID             int    `json:"id"`
+		ModID          int    `json:"mod_id"`
+		DateAdded      int    `json:"date_added"`
+		DateScanned    int    `json:"date_scanned"`
+		VirusStatus    int    `json:"virus_status"`
+		VirusPositive  int    `json:"virus_positive"`
+		VirustotalHash string `json:"virustotal_hash"`
+		Filesize       int    `json:"filesize"`
+		Filehash       struct {
+			Md5 string `json:"md5"`
+		} `json:"filehash"`
+		Filename     string `json:"filename"`
+		Version      string `json:"version"`
+		Changelog    string `json:"changelog"`
+		MetadataBlob string `json:"metadata_blob"`
+		Download     struct {
+			BinaryURL   string `json:"binary_url"`
+			DateExpires int    `json:"date_expires"`
+		} `json:"download"`
+	} `json:"modfile"`
+	MetadataKvp []struct {
+		Metakey   string `json:"metakey"`
+		Metavalue string `json:"metavalue"`
+	} `json:"metadata_kvp"`
+	Tags []struct {
+		Name      string `json:"name"`
+		DateAdded int    `json:"date_added"`
+	} `json:"tags"`
+	Stats struct {
+		ModID                     int     `json:"mod_id"`
+		PopularityRankPosition    int     `json:"popularity_rank_position"`
+		PopularityRankTotalMods   int     `json:"popularity_rank_total_mods"`
+		DownloadsTotal            int     `json:"downloads_total"`
+		SubscribersTotal          int     `json:"subscribers_total"`
+		RatingsTotal              int     `json:"ratings_total"`
+		RatingsPositive           int     `json:"ratings_positive"`
+		RatingsNegative           int     `json:"ratings_negative"`
+		RatingsPercentagePositive int     `json:"ratings_percentage_positive"`
+		RatingsWeightedAggregate  float64 `json:"ratings_weighted_aggregate"`
+		RatingsDisplayText        string  `json:"ratings_display_text"`
+		DateExpires               int     `json:"date_expires"`
+	} `json:"stats"`
+}
+    Subscribe Struct Maps to JSON Response for Subscribing
+
+type Tag struct {
+	Name      string `json:"name"`
+	DateAdded int    `json:"date_added"`
+}
+    Tag struct represents the tag object from mod.io
+
+type Tags struct {
+	Data         []Tag `json:"data"`
+	ResultCount  int   `json:"result_count"`
+	ResultLimit  int   `json:"result_limit"`
+	ResultTotal  int   `json:"result_total"`
+	ResultOffset int   `json:"result_offset"`
+}
+    Tags struct is a collection of Tags
+
+type User struct {
+	// Has unexported fields.
+}
+    User Struct for mod.io
+
+func NewUser(apikey string, email string) *User
+    NewUser - Initializes a new User
+
+func (u *User) APIKey() string
+    APIKey returns the User's API key
+
+func (user *User) AddGameMedia(logo, icon, header string, gameID int) (msg *Message, err error)
+    AddGameMedia adds game media
+
+func (user *User) AddGameTagOption(tagGroupName, tagGroupType string, tags []string, gameID int, options map[string]string) (m *Message, err error)
+    AddGameTagOption adds a single option to game tags
+
+func (user *User) AddMod(logo string, modName string, summary string, options map[string]string, gameID int) (res *Mod, err error)
+    AddMod adds a mod taking bytes for files and returns Mod object
+
+func (user *User) AddModComment(content string, modID, gameID int, options map[string]string) (res *Comment, err error)
+    AddModComment adds a mod comment
+
+func (user *User) AddModMedia(modID, gameID int, options map[string]string) (msg *Message, err error)
+    AddModMedia adds mod media
+
+func (u *User) AddModMetadata(metadata []string, modID, gameID int) (m *Message, err error)
+    AddModMetadata adds metadata to a mod
+
+func (user *User) AddModRating(isPositive bool, modID, gameID int) (m *Message, err error)
+    AddModRating adds a rating to a mod. Requires OAuth2
+
+func (user *User) AddModTags(tags []string, modID, gameID int) (t *Message, err error)
+    AddModTags adds a tag to a mod. Requires OAuth2
+
+func (user *User) AddModfile(modID int, gameID int, fp string, options map[string]string) (f *File, err error)
+    AddModfile sends a POST request to upload a mod file
+
+func (user *User) DeleteGameTagOption(tagGroupName string, tags []string, gameID int) (err error)
+    DeleteGameTagOption deletes a game tag option
+
+func (user *User) DeleteMod(modID int, gameID int) (err error)
+    DeleteMod sends a request to delete a mod
+
+func (user *User) DeleteModMedia(modID, gameID int, options map[string]string) (err error)
+    DeleteModMedia deletes mod media
+
+func (u *User) DeleteModMetadata(metadata []string, modID, gameID int) (err error)
+    DeleteModMetadata deletes a mod's metadata
+
+func (user *User) DeleteModTags(tags []string, modID, gameID int) (err error)
+    DeleteModTags deletes a tag from a mod. Requires OAuth2
+
+func (user *User) EditGame(gameID int, query map[string]string) (res *Game, err error)
+    EditGame function makes a PUT request and returns the updated Game Object
+
+func (user *User) EditMod(modID int, gameID int, options map[string]string) (res *Mod, err error)
+    EditMod edits a mod
+
+func (u *User) Email() string
+    Email returns the User's Email
+
+func (u *User) ExchangeSecurityCode(securitycode string) *User
+    ExchangeSecurityCode Function
+
+func (user *User) GetGame(gameID int, query map[string]string) (res *Game, err error)
+    GetGame function returns a Game struct
+
+func (u *User) GetGameStats(gameID int) (gs *GameStats, err error)
+    GetGameStats gets a game's stats
+
+func (user *User) GetGameTagOptions(gameID int) (t *Tags, err error)
+    GetGameTagOptions gets a game's tag options
+
+func (user *User) GetGames(query map[string]string) (res *Games, err error)
+    GetGames from mod.io
+
+func (user *User) GetMod(modID int, gameID int, query map[string]string) (res *Mods, err error)
+    GetMod searches for a mod and returns a Mods object
+
+func (user *User) GetModComment(commentID int, modID int, gameID int) (res *Comment, err error)
+    GetModComment searches for a mod comment specifically
+
+func (user *User) GetModComments(modID int, gameID int, options map[string]string) (res *Comments, err error)
+    GetModComments searches for mod comments
+
+func (user *User) GetModEvents(gameID int, modID int) (e *Events, err error)
+    GetModEvents gets a single mod's events
+
+func (u *User) GetModMetadata(modID, gameID int) (mm *ModMetadata, err error)
+    GetModMetadata gets a mod's metadata
+
+func (u *User) GetModStats(modID, gameID int) (s *Stats, err error)
+    GetModStats gets a mod's stats
+
+func (user *User) GetModTags(modID, gameID int, options map[string]string) (t *Tags, err error)
+    GetModTags grabs tags from a mod
+
+func (user *User) GetMods(gameID int, query map[string]string) (res *Mods, err error)
+    GetMods searches for mods and returns a Mods object
+
+func (user *User) GetModsEvents(gameID int, options map[string]string) (e *Events, err error)
+    GetModsEvents gets all mods events
+
+func (u *User) GetModsStats(gameID int, options map[string]int) (ms *ModStats, err error)
+    GetModsStats gets a game's mod's stats
+
+func (u *User) OAuth2Token() string
+    OAuth2Token returns the User's OAuth2Token
+
+func (u *User) RequestSecurityCode() bool
+    RequestSecurityCode Authenticate with mod.io Using API Key Only
+
+func (u *User) SetOAuth2Token(token string)
+    SetOAuth2Token sets a User's OAuth2Token token is the OAuth2 Token from
+    mod.io
+
+func (user *User) SubscribeToMod(modID, gameID int) (s *Subscribe, err error)
+    SubscribeToMod sends a request to subscribe to a mod
+
+func (user *User) UnsubscribeToMod(modID, gameID int) (err error)
+    UnsubscribeToMod sends a request to subscribe to a mod
+
